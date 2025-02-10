@@ -115,10 +115,13 @@
 </style>
 <!-- Search Bar -->
 <div class="search-bar">
-    <form action="{{ route('users.kelola') }}" method="GET">
-        <input type="text" name="search" placeholder="Search by name, email, phone, etc..." value="{{ request()->input('search') }}" />
+    <form id="search-form" action="{{ route('users.kelola') }}" method="GET">
+        @csrf
+        <input type="text" id="search-input" name="search" placeholder="Search by name, email, phone, etc...">
     </form>
 </div>
+
+
 <!-- Button to Open Modal Create -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
     Create New User
@@ -170,82 +173,92 @@
                     </td>
                 </tr>
                 <!-- Modal Create User -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createModalLabel">Create New User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="createForm" action="{{ route('users.store') }}" method="POST">
-                @csrf
-
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="username" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                            <small class="text-danger" id="usernameError"></small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                            <small class="text-danger" id="emailError"></small>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="no_hp" class="form-label">No HP</label>
-                            <input type="text" class="form-control" id="no_hp" name="no_hp" required>
-                            <small class="text-danger" id="no_hpError"></small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="address" class="form-label">Address</label>
-                            <input type="text" class="form-control" id="address" name="address" required>
-                            <small class="text-danger" id="addressError"></small>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="jurusan" class="form-label">Jurusan</label>
-                            <select class="form-select" id="jurusan" name="jurusan" required>
-                                <option value="RPL">RPL</option>
-                                <option value="Otomotif">Otomotif</option>
-                                <option value="DPIB">DPIB</option>
-                                <option value="DKV">DKV</option>
-                            </select>
-                            <small class="text-danger" id="jurusanError"></small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="Admin">Admin</option>
-                                <option value="User">User</option>
-                            </select>
-                            <small class="text-danger" id="roleError"></small>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                            <small class="text-danger" id="passwordError"></small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
-                            <small class="text-danger" id="passwordConfirmationError"></small>
+                <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="createModalLabel">Create New User</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="createUserForm">
+                                @csrf
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="username" class="form-label">Name</label>
+                                            <input type="text" class="form-control" id="username" name="username" >
+                                            <small class="text-danger" id="usernameError"></small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" >
+                                            <small class="text-danger" id="emailError"></small>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="no_hp" class="form-label">No HP</label>
+                                            <input type="text" class="form-control" id="no_hp" name="no_hp" >
+                                            <small class="text-danger" id="no_hpError"></small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="address" class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="address" name="address" >
+                                            <small class="text-danger" id="addressError"></small>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="jurusan" class="form-label">Jurusan</label>
+                                            <select class="form-select" id="jurusan" name="jurusan" >
+                                                <option value="RPL">RPL</option>
+                                                <option value="Otomotif">Otomotif</option>
+                                                <option value="DPIB">DPIB</option>
+                                                <option value="DKV">DKV</option>
+                                            </select>
+                                            <small class="text-danger" id="jurusanError"></small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="role" class="form-label">Role</label>
+                                            <select class="form-select" id="role" name="role" >
+                                                <option value="Admin">Admin</option>
+                                                <option value="User">User</option>
+                                            </select>
+                                            <small class="text-danger" id="roleError"></small>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password" class="form-label">Password</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="password" name="password">
+                                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('password')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-danger" id="passwordError"></small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                                            <div class="input-group">
+                                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+                                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('password_confirmation')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-danger" id="passwordConfirmationError"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Create User</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create User</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
                 <!-- Modal Edit User -->
                 <div class="modal fade" id="editModal{{ $user->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $user->id }}" aria-hidden="true">
                     <div class="modal-dialog">
@@ -369,45 +382,34 @@
 });
 
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#createForm').on('submit', function (e) {
-            e.preventDefault();
-
-            let formData = $(this).serialize();
-            let formAction = $(this).attr('action');
-
-            // Clear previous errors
-            $('small.text-danger').text('');
-
-            $.ajax({
-                url: formAction,
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    alert('User created successfully!');
-                    location.reload(); // Reload page to reflect changes
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        // Tampilkan pesan error dari server
-                        let errors = xhr.responseJSON.errors;
-                        for (let key in errors) {
-                            $(`#${key}Error`).text(errors[key][0]);
-                        }
-                    } else {
-                        alert('Something went wrong. Please try again.');
-                    }
-                },
-            });
-        });
-    });
-</script>
-        </tbody>
-    </table>
+</tbody>
+</table>
 </div>
 
+<script>
+    document.getElementById('search-input').addEventListener('keyup', function() {
+        document.getElementById('search-form').submit();
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function togglePasswordVisibility(fieldId) {
+    const passwordField = document.getElementById(fieldId);
+    const eyeIcon = passwordField.nextElementSibling.querySelector('i');
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = "password";
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+</script>
 <!-- Pagination Section -->
 <div class="pagination">
     @if ($users->currentPage() > 1)
@@ -422,6 +424,54 @@
         <a href="{{ $users->nextPageUrl() }}" class="next">Next</a>
     @endif
 </div>
+<script>
+    $('#createUserForm').submit(function(e) {
+        e.preventDefault();
 
+        let formData = {
+            _token: $('input[name=_token]').val(),
+            username: $('#username').val(),
+            email: $('#email').val(),
+            password: $('#password').val(),
+            password_confirmation: $('#password_confirmation').val(),
+            role: $('#role').val(),
+            jurusan: $('#jurusan').val(),
+            no_hp: $('#no_hp').val(),
+            address: $('#address').val(),
+            status: 0 // Default status ke 0
+        };
 
-@endsection
+        console.log("Form Data Sent:", formData); // Debugging
+
+        $.ajax({
+            url: "/users",
+            type: "POST",
+            data: formData,
+            success: function(response) {
+                console.log("Server Response:", response); // Debugging
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+                $('#createModal').modal('hide');
+                location.reload();
+            },
+            error: function(xhr) {
+                console.log("Error Response:", xhr.responseJSON); // Debugging
+                let errors = xhr.responseJSON.errors;
+                $('.text-danger').text('');
+                $.each(errors, function(key, value) {
+                    $('#' + key + 'Error').text(value[0]);
+                });
+            }
+        });
+    });
+</script>
+ @endsection

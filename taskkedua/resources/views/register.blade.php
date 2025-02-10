@@ -180,11 +180,11 @@
 
         /* Error Message Style */
         .error-message {
-            color: #f44336;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
+    color: #f44336;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: none; /* Awalnya disembunyikan */
+}
 
         /* Responsive Design */
         @media (min-width: 768px) {
@@ -209,20 +209,20 @@
             </div>
         @endif
 
-        <form action="{{ route('register') }}" method="post">
+        <form id="registerForm" action="{{ route('register') }}" method="post">
             @csrf
             <div class="row">
                 <div class="col">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" name="username" value="{{ old('username') }}" placeholder="Enter your username" required>
+                        <input type="text" id="username" name="username" value="{{ old('username') }}" placeholder="Enter your username" >
                         <span class="error-message" id="username-error"></span>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required>
+                        <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" >
                         <span class="error-message" id="email-error"></span>
                     </div>
                 </div>
@@ -231,14 +231,14 @@
                 <div class="col">
                     <div class="form-group">
                         <label for="no_hp">Phone Number</label>
-                        <input type="number" id="no_hp" name="no_hp" value="{{ old('no_hp') }}" placeholder="Enter your phone number" required>
+                        <input type="number" id="no_hp" name="no_hp" value="{{ old('no_hp') }}" placeholder="Enter your phone number" >
                         <span class="error-message" id="no_hp-error"></span>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
                         <label for="address">Address</label>
-                        <textarea name="address" id="address" placeholder="Enter your address" required>{{ old('address') }}</textarea>
+                        <textarea name="address" id="address" placeholder="Enter your address" >{{ old('address') }}</textarea>
                         <span class="error-message" id="address-error"></span>
                     </div>
                 </div>
@@ -247,7 +247,7 @@
                 <div class="col">
                     <div class="form-group">
                         <label for="jurusan">Jurusan</label>
-                        <select id="jurusan" name="jurusan" required>
+                        <select id="jurusan" name="jurusan" >
                             <option value="" disabled selected>Select your department</option>
                             <option value="RPL">RPL</option>
                             <option value="Otomotif">Otomotif</option>
@@ -261,7 +261,7 @@
                     <div class="form-group">
                         <label for="password">Password</label>
                         <div style="position: relative;">
-                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" >
                             <span id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #a6b1e1;">👁️</span>
                         </div>
                         <span class="error-message" id="password-error"></span>
@@ -273,7 +273,7 @@
                     <div class="form-group">
                         <label for="password_confirmation">Confirm Password</label>
                         <div style="position: relative;">
-                            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm your password" required>
+                            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm your password" >
                             <span id="toggleConfirmPassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #a6b1e1;">👁️</span>
                         </div>
                         <span class="error-message" id="password_confirmation-error"></span>
@@ -283,6 +283,7 @@
             <button type="submit" class="btn">Register</button>
             <a href="{{ route('login') }}" class="link">Already have an account? Login</a>
         </form>
+        
     </div>
 
     <script>
@@ -293,31 +294,52 @@
             passwordInput.setAttribute('type', type);
             this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
         });
-
+    
         document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
             const confirmPasswordInput = document.getElementById('password_confirmation');
             const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             confirmPasswordInput.setAttribute('type', type);
             this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
         });
-
-        // Form Validation
-        document.querySelector('form').addEventListener('submit', function(event) {
-            let isValid = true;
-            const inputs = document.querySelectorAll('input, textarea, select');
-            inputs.forEach(input => {
-                const errorMessage = document.getElementById(`${input.id}-error`);
-                if (!input.value.trim()) {
-                    errorMessage.textContent = 'This field is required';
-                    errorMessage.style.display = 'block';
-                    isValid = false;
-                } else {
-                    errorMessage.style.display = 'none';
-                }
+    
+        // AJAX Form Submission
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah form dikirim secara default
+    
+            // Sembunyikan pesan error sebelumnya
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.style.display = 'none';
             });
-            if (!isValid) {
-                event.preventDefault();
-            }
+    
+            // Ambil data form
+            const formData = new FormData(this);
+    
+            // Kirim data menggunakan AJAX
+            fetch("{{ route('register') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.errors) {
+                    // Tampilkan pesan error untuk setiap inputan
+                    Object.keys(data.errors).forEach(field => {
+                        const errorMessage = document.getElementById(`${field}-error`);
+                        errorMessage.textContent = data.errors[field][0];
+                        errorMessage.style.display = 'block';
+                    });
+                } else if (data.success) {
+                    // Jika berhasil, redirect ke halaman login
+                    window.location.href = "{{ route('login') }}";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
     </script>
 </body>

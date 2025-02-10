@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 
@@ -37,7 +38,12 @@ class AdminController extends Controller
         $totalUsers = User::count();
         $totalAdmins = User::where('role', 'Admin')->count();
     
-        return view('userkelola', compact('users', 'totalUsers', 'totalAdmins'));
+        // Cek apakah hasil pencarian kosong
+        $message = null;
+        if ($search && $users->isEmpty()) {
+            $message = "Data dengan kata kunci '$search' tidak ditemukan.";
+        }
+        return view('userkelola', compact('users', 'totalUsers', 'totalAdmins', 'message'));
     }
     
     
@@ -65,7 +71,7 @@ class AdminController extends Controller
             ]);
             alert()->success('Success', 'User data updated successfully!');
             return redirect('/kelola');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error updating user: ' . $e->getMessage());
             alert()->error('Error', 'Failed to update user. Please try again.');
             return redirect('/kelola');
@@ -118,34 +124,39 @@ class AdminController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'username' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'no_hp' => 'required|string|max:15',
-                'address' => 'required|string|max:255',
-                'jurusan' => 'required|string|max:100',
-                'password' => 'required|min:8|confirmed',
-                'role' => 'required|in:Admin,User', // Validasi role
-            ]);
 
-            User::create([
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'no_hp' => 'required|string|max:15|unique:users,no_hp',
+            'address' => 'required|string|max:255',
+            'jurusan' => 'required|string|max:100',
+            'password' => 'required|min:8|confirmed',
+        ]);
+        
+        try {
+            $user = User::create([
                 'username' => $request->username,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
-                'role' => $request->role,
+                'role' => 'User',
                 'jurusan' => $request->jurusan,
                 'no_hp' => $request->no_hp,
                 'address' => $request->address,
-                'status' => 1, // Default status aktif
+                'status' => 0,
             ]);
 
-            toast('User created successfully!', 'success');
-            return redirect()->route('users.kelola');
-        } catch (\Exception $e) {
-            Log::error('Error creating user: ' . $e->getMessage());
-            toast('Failed to create user. Please try again.', 'error');
-            return back()->withInput();
+            return response()->json([
+                'success' => true,
+                'message' => 'User created successfully!',
+                'user' => $user
+            ], 201);
+        } catch (Exception $e) {
+            // Tangani error lainnya
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -156,12 +167,12 @@ class AdminController extends Controller
             $request->validate([
                 'username' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
-                'no_hp' => 'required|string|max:15',
+                'no_hp' => 'required|string|max:15|unique:users,no_hp',
                 'address' => 'required|string|max:255',
                 'jurusan' => 'required|string|max:100',
                 'password' => 'required|min:8|confirmed',
             ]);
-
+    
             User::create([
                 'username' => $request->username,
                 'email' => $request->email,
@@ -172,13 +183,14 @@ class AdminController extends Controller
                 'address' => $request->address,
                 'status' => 0,
             ]);
-            toast('Data Saved Successfully', 'success');
-            return redirect()->route('login')->with('success', 'Akun berhasil dibuat. Silakan login.');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+    
+            return response()->json(['success' => 'Akun berhasil dibuat. Silakan login.']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
     public function profile()
     {
         $user = Auth::user();
@@ -205,7 +217,7 @@ class AdminController extends Controller
         $user->delete();
         FacadesAlert::success('Success', 'User deleted successfully!');
         return redirect()->route('users.kelola');
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         Log::error('Error deleting user: ' . $e->getMessage());
         FacadesAlert::error('Error', 'Failed to delete user. Please try again.');
         return redirect()->route('users.kelola');
