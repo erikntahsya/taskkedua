@@ -52,7 +52,9 @@ Route::middleware('auth')->group(function () {
         
 
         // Route untuk mengelola pengguna, exclude edit & create
-        Route::resource('users', AdminController::class)->except(['edit', 'create']);
+        // Route::resource('users', AdminController::class)->except(['edit', 'create']);
+        Route::put('/users/{id}', [AdminController::class, 'update'])->name('users.update');
+
     });
 
     Route::middleware('role:User')->group(function () {

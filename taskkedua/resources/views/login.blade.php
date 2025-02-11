@@ -21,7 +21,15 @@
             align-items: center;
             color: #fff;
         }
-    
+        .success-message {
+            color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+            padding: 10px;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
         .background {
             position: absolute;
             width: 100%;
@@ -256,6 +264,33 @@
         .toggle-password:hover {
             color: #fff;
         }
+        .swal2-popup {
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 255, 150, 0.5); /* Efek glow hijau */
+        }
+
+        .swal2-title {
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00E676; /* Warna neon hijau */
+            text-shadow: 0 0 5px #00E676;
+        }
+
+        .swal2-confirm {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #00E676, #00C853);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 255, 150, 0.7);
+        }
+
+        .swal2-icon {
+            filter: drop-shadow(0 0 10px rgba(0, 255, 150, 0.8));
+        }
 
     </style>
     
@@ -299,6 +334,28 @@
     </div>
 </body>
 @include('sweetalert::alert')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    @if (session('success'))
+        Swal.fire({
+            title: "Logoutt Berhasil!",
+            text: "{{ session('success') }}",
+            icon: "success",
+            background: "linear-gradient(135deg, #2C2C2C, #1A1A1A)", // Gradasi gelap modern
+            color: "#fff", // Warna teks putih biar lebih elegan
+            iconColor: "#00E676", // Warna hijau neon untuk ikon
+            confirmButtonColor: "#00E676", // Tombol hijau neon yang futuristik
+            confirmButtonText: "Lanjutkan",
+            showClass: {
+                popup: "animate__animated animate__fadeInDown", // Animasi masuk
+            },
+            hideClass: {
+                popup: "animate__animated animate__fadeOutUp", // Animasi keluar
+            }
+        });
+    @endif
+</script>
 <script>
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
@@ -312,5 +369,7 @@
         this.classList.toggle('fa-eye');
         this.classList.toggle('fa-eye-slash');
     });
+    
 </script>
+
 </html>

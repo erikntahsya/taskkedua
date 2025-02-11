@@ -88,12 +88,23 @@
 @if(session('success'))
     <script>
         Swal.fire({
-            title: 'Berhasil!',
-            text: '{{ session('success') }}',
-            icon: 'success',
-            confirmButtonText: 'OK'
+            title: "Berhasil!",
+            text: "{{ session('success') }}",
+            icon: "success",
+            background: "linear-gradient(135deg, #2C2C2C, #1A1A1A)", // Gradasi gelap modern
+            color: "#fff", // Warna teks putih biar lebih elegan
+            iconColor: "#00E676", // Warna hijau neon untuk ikon
+            confirmButtonColor: "#00E676", // Tombol hijau neon yang futuristik
+            confirmButtonText: "OK",
+            showClass: {
+                popup: "animate__animated animate__fadeInDown", // Animasi masuk
+            },
+            hideClass: {
+                popup: "animate__animated animate__fadeOutUp", // Animasi keluar
+            }
         });
     </script>
 @endif
+
 
 @endsection

@@ -54,10 +54,18 @@ class AdminController extends Controller
             'username' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'no_hp' => 'required|string|max:15',
-            'address' => 'required|string|max:255',
+            'address' => 'required|string|max:255', // Perbaiki ini
             'jurusan' => 'required|string|max:100',
             'status' => 'required|in:Active,Inactive',
-        ]);
+        ],
+        [
+            'username.required' => 'Username is required.', // Custom error message
+            'email.required' => 'Email is required.', // Custom error message
+            'no_hp.required' => 'Phone number is required.', // Custom error message
+            'address.required' => 'Address is required.',    // Custom error message
+        ]
+    );
+        
     
         try {
             $user = User::findOrFail($id);

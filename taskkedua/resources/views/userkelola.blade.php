@@ -113,19 +113,17 @@
         color: white;
     }
 </style>
-<!-- Search Bar -->
 <div class="search-bar">
     <form id="search-form" action="{{ route('users.kelola') }}" method="GET">
-        @csrf
         <input type="text" id="search-input" name="search" placeholder="Search by name, email, phone, etc...">
     </form>
 </div>
-
 
 <!-- Button to Open Modal Create -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
     Create New User
 </button>
+
 <!-- Table -->
 <div class="table-responsive text-nowrap">
     <table class="table table-hover table-striped align-middle mb-0" id="manage-table">
@@ -142,275 +140,206 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($users as $user)
-                <tr class="text-center">
-                    <td class="fw-bold">{{ $user->username }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->no_hp }}</td>
-                    <td>{{ $user->address }}</td>
-                    <td>{{ $user->jurusan }}</td>
-                    <td>
-                        {{ $user->status == 1 ? 'Active' : 'Inactive' }}
-                    </td>
-                    <td>{{ $user->role }}</td>
-                    <td>
-                        <div class="d-flex justify-content-center gap-2">
-                            @if($user->role !== 'Admin')
-                                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#editModal{{ $user->id }}">
-                                    <i class="bx bx-edit-alt"></i>
-                                </button>
-
-                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bx bx-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-                <!-- Modal Create User -->
-                <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="createModalLabel">Create New User</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form id="createUserForm">
-                                @csrf
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="username" class="form-label">Name</label>
-                                            <input type="text" class="form-control" id="username" name="username" >
-                                            <small class="text-danger" id="usernameError"></small>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="email" name="email" >
-                                            <small class="text-danger" id="emailError"></small>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="no_hp" class="form-label">No HP</label>
-                                            <input type="text" class="form-control" id="no_hp" name="no_hp" >
-                                            <small class="text-danger" id="no_hpError"></small>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="address" class="form-label">Address</label>
-                                            <input type="text" class="form-control" id="address" name="address" >
-                                            <small class="text-danger" id="addressError"></small>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="jurusan" class="form-label">Jurusan</label>
-                                            <select class="form-select" id="jurusan" name="jurusan" >
-                                                <option value="RPL">RPL</option>
-                                                <option value="Otomotif">Otomotif</option>
-                                                <option value="DPIB">DPIB</option>
-                                                <option value="DKV">DKV</option>
-                                            </select>
-                                            <small class="text-danger" id="jurusanError"></small>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="role" class="form-label">Role</label>
-                                            <select class="form-select" id="role" name="role" >
-                                                <option value="Admin">Admin</option>
-                                                <option value="User">User</option>
-                                            </select>
-                                            <small class="text-danger" id="roleError"></small>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="password" class="form-label">Password</label>
-                                            <div class="input-group">
-                                                <input type="password" class="form-control" id="password" name="password">
-                                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('password')">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </div>
-                                            <small class="text-danger" id="passwordError"></small>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                            <div class="input-group">
-                                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
-                                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('password_confirmation')">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </div>
-                                            <small class="text-danger" id="passwordConfirmationError"></small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Create User</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal Edit User -->
-                <div class="modal fade" id="editModal{{ $user->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $user->id }}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editModalLabel{{ $user->id }}">Edit User</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form id="editForm{{ $user->id }}" action="{{ route('users.update', $user->id) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="username{{ $user->id }}" class="form-label">Name</label>
-                                            <input type="text" class="form-control" id="username{{ $user->id }}" name="username" value="{{ old('username', $user->username) }}">
-                                            <small class="text-danger" id="usernameError{{ $user->id }}"></small>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="email{{ $user->id }}" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="email{{ $user->id }}" name="email" value="{{ old('email', $user->email) }}">
-                                            <small class="text-danger" id="emailError{{ $user->id }}"></small>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                    <label for="no_hp{{ $user->id }}" class="form-label">No HP</label>
-                                    <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        id="no_hp{{ $user->id }}" 
-                                        name="no_hp" 
-                                        value="{{ old('no_hp', $user->no_hp) }}" 
-                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                                    <small class="text-danger" id="no_hpError{{ $user->id }}"></small>
-                                </div>
-
-                                        <div class="col-md-6 mb-3">
-                                            <label for="address{{ $user->id }}" class="form-label">Address</label>
-                                            <input type="text" class="form-control" id="address{{ $user->id }}" name="address" value="{{ old('address', $user->address) }}">
-                                            <small class="text-danger" id="addressError{{ $user->id }}"></small>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="jurusan{{ $user->id }}" class="form-label">Jurusan</label>
-                                            <select class="form-select" id="jurusan{{ $user->id }}" name="jurusan">
-                                                <option value="RPL" {{ old('jurusan', $user->jurusan) == 'RPL' ? 'selected' : '' }}>RPL</option>
-                                                <option value="Otomotif" {{ old('jurusan', $user->jurusan) == 'Otomotif' ? 'selected' : '' }}>Otomotif</option>
-                                                <option value="DPIB" {{ old('jurusan', $user->jurusan) == 'DPIB' ? 'selected' : '' }}>DPIB</option>
-                                                <option value="DKV" {{ old('jurusan', $user->jurusan) == 'DKV' ? 'selected' : '' }}>DKV</option>
-                                            </select>
-                                            <small class="text-danger" id="jurusanError{{ $user->id }}"></small>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="status{{ $user->id }}" class="form-label">Status</label>
-                                            <select class="form-select" id="status{{ $user->id }}" name="status">
-                                                <option value="Active" {{ old('status', $user->status == 1 ? 'Active' : 'Inactive') == 'Active' ? 'selected' : '' }}>Active</option>
-                                                <option value="Inactive" {{ old('status', $user->status == 0 ? 'Inactive' : 'Active') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
-                                            </select>
-                                            <small class="text-danger" id="statusError{{ $user->id }}"></small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" id="saveChanges{{ $user->id }}">Save changes</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-            @endforeach
             @if($users->isEmpty())
                 <tr>
-                    <td colspan="7" class="text-center py-5">
+                    <td colspan="8" class="text-center py-5">
                         <i class="bx bx-info-circle fs-2 text-muted"></i>
                         <p class="text-muted mb-0">No user data available</p>
                     </td>
                 </tr>
+            @else
+                @foreach($users as $user)
+                    <tr class="text-center">
+                        <td class="fw-bold">{{ $user->username }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->no_hp }}</td>
+                        <td>{{ $user->address }}</td>
+                        <td>{{ $user->jurusan }}</td>
+                        <td>{{ $user->status == 1 ? 'Active' : 'Inactive' }}</td>
+                        <td>{{ $user->role }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                @if($user->role !== 'Admin')
+                                    <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#editModal{{ $user->id }}">
+                                        <i class="bx bx-edit-alt"></i>
+                                    </button>
+                                    <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Modal Edit User -->
+                    <div class="modal fade" id="editModal{{ $user->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $user->id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editModalLabel{{ $user->id }}">Edit User</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form id="editForm{{ $user->id }}" action="{{ route('users.update', $user->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="username{{ $user->id }}" class="form-label">Name</label>
+                                                <input type="text" class="form-control" id="username{{ $user->id }}" name="username" value="{{ old('username', $user->username) }}">
+                                                <small class="text-danger" id="usernameError{{ $user->id }}"></small>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="email{{ $user->id }}" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="email{{ $user->id }}" name="email" value="{{ old('email', $user->email) }}">
+                                                <small class="text-danger" id="emailError{{ $user->id }}"></small>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="no_hp{{ $user->id }}" class="form-label">No HP</label>
+                                                <input type="text" class="form-control" id="no_hp{{ $user->id }}" name="no_hp" value="{{ old('no_hp', $user->no_hp) }}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                                <small class="text-danger" id="no_hpError{{ $user->id }}"></small>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="address{{ $user->id }}" class="form-label">Address</label>
+                                                <input type="text" class="form-control" id="address{{ $user->id }}" name="address" value="{{ old('address', $user->address) }}">
+                                                <small class="text-danger" id="addressError{{ $user->id }}"></small>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="jurusan{{ $user->id }}" class="form-label">Jurusan</label>
+                                                <select class="form-select" id="jurusan{{ $user->id }}" name="jurusan">
+                                                    <option value="RPL" {{ old('jurusan', $user->jurusan) == 'RPL' ? 'selected' : '' }}>RPL</option>
+                                                    <option value="Otomotif" {{ old('jurusan', $user->jurusan) == 'Otomotif' ? 'selected' : '' }}>Otomotif</option>
+                                                    <option value="DPIB" {{ old('jurusan', $user->jurusan) == 'DPIB' ? 'selected' : '' }}>DPIB</option>
+                                                    <option value="DKV" {{ old('jurusan', $user->jurusan) == 'DKV' ? 'selected' : '' }}>DKV</option>
+                                                </select>
+                                                <small class="text-danger" id="jurusanError{{ $user->id }}"></small>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="status{{ $user->id }}" class="form-label">Status</label>
+                                                <select class="form-select" id="status{{ $user->id }}" name="status">
+                                                    <option value="Active" {{ old('status', $user->status == 1 ? 'Active' : 'Inactive') == 'Active' ? 'selected' : '' }}>Active</option>
+                                                    <option value="Inactive" {{ old('status', $user->status == 0 ? 'Inactive' : 'Active') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                                                </select>
+                                                <small class="text-danger" id="statusError{{ $user->id }}"></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                @endforeach
             @endif
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#editForm{{ $user->id }}').on('submit', function (e) {
-            e.preventDefault();
-
-            let formData = $(this).serialize();
-            let formAction = $(this).attr('action');
-
-            // Clear previous errors
-            $('small.text-danger').text('');
-
-            $.ajax({
-                url: formAction,
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    alert('User updated successfully!');
-                    location.reload(); // Reload page to reflect changes
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        // Tampilkan pesan error dari server
-                        let errors = xhr.responseJSON.errors;
-                        for (let key in errors) {
-                            $(`#${key}Error{{ $user->id }}`).text(errors[key][0]);
-                        }
-                    } else {
-                        alert('Something went wrong. Please try again.');
-                    }
-                },
-            });
-        });
-    });
-    $.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-    },
-});
-
-</script>
-</tbody>
-</table>
+        </tbody>
+    </table>
 </div>
 
-<script>
-    document.getElementById('search-input').addEventListener('keyup', function() {
-        document.getElementById('search-form').submit();
-    });
-</script>
+<!-- Modal Create User -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">Create New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createUserForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="username" name="username">
+                            <small class="text-danger" id="usernameError"></small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                            <small class="text-danger" id="emailError"></small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="no_hp" class="form-label">No HP</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="no_hp" 
+                                name="no_hp" 
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <small class="text-danger" id="no_hpError"></small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="address" name="address">
+                            <small class="text-danger" id="addressError"></small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="jurusan" class="form-label">Jurusan</label>
+                            <select class="form-select" id="jurusan" name="jurusan">
+                                <option value="RPL">RPL</option>
+                                <option value="Otomotif">Otomotif</option>
+                                <option value="DPIB">DPIB</option>
+                                <option value="DKV">DKV</option>
+                            </select>
+                            <small class="text-danger" id="jurusanError"></small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="Admin">Admin</option>
+                                <option value="User">User</option>
+                            </select>
+                            <small class="text-danger" id="roleError"></small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password">
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-danger" id="passwordError"></small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('password_confirmation')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-danger" id="passwordConfirmationError"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function togglePasswordVisibility(fieldId) {
-    const passwordField = document.getElementById(fieldId);
-    const eyeIcon = passwordField.nextElementSibling.querySelector('i');
-
-    if (passwordField.type === "password") {
-        passwordField.type = "text";
-        eyeIcon.classList.remove('fa-eye');
-        eyeIcon.classList.add('fa-eye-slash');
-    } else {
-        passwordField.type = "password";
-        eyeIcon.classList.remove('fa-eye-slash');
-        eyeIcon.classList.add('fa-eye');
-    }
-}
-</script>
-<!-- Pagination Section -->
+<!-- Pagination -->
 <div class="pagination">
     @if ($users->currentPage() > 1)
         <a href="{{ $users->previousPageUrl() }}" class="prev">Prev</a>
@@ -424,47 +353,33 @@
         <a href="{{ $users->nextPageUrl() }}" class="next">Next</a>
     @endif
 </div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Handle create form submission
     $('#createUserForm').submit(function(e) {
         e.preventDefault();
-
-        let formData = {
-            _token: $('input[name=_token]').val(),
-            username: $('#username').val(),
-            email: $('#email').val(),
-            password: $('#password').val(),
-            password_confirmation: $('#password_confirmation').val(),
-            role: $('#role').val(),
-            jurusan: $('#jurusan').val(),
-            no_hp: $('#no_hp').val(),
-            address: $('#address').val(),
-            status: 0 // Default status ke 0
-        };
-
-        console.log("Form Data Sent:", formData); // Debugging
-
+        let formData = $(this).serialize();
         $.ajax({
-            url: "/users",
-            type: "POST",
+            url: "{{ route('users.store') }}",
+            method: "POST",
             data: formData,
             success: function(response) {
-                console.log("Server Response:", response); // Debugging
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
                 $('#createModal').modal('hide');
                 location.reload();
             },
             error: function(xhr) {
-                console.log("Error Response:", xhr.responseJSON); // Debugging
                 let errors = xhr.responseJSON.errors;
                 $('.text-danger').text('');
                 $.each(errors, function(key, value) {
@@ -473,5 +388,75 @@
             }
         });
     });
+
+    // Handle edit form submission using event delegation
+    $(document).on('submit', '[id^=editForm]', function(e) {
+    e.preventDefault();
+    let formData = $(this).serialize();
+    let formAction = $(this).attr('action');
+    let formId = $(this).attr('id').replace('editForm', '');
+
+    $.ajax({
+        url: formAction,
+        method: "POST",
+        data: formData,
+        success: function(response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: response.message,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            location.reload();
+        },
+        error: function(xhr) {
+            var response = xhr.responseJSON;
+            if (response.errors) {
+                if (response.errors.username) {
+                    $('#usernameError' + formId).text(response.errors.username.join(' '));
+                }
+                if (response.errors.email) {
+                    $('#emailError' + formId).text(response.errors.email.join(' '));
+                }
+                if (response.errors.no_hp) {
+                    $('#no_hpError' + formId).text(response.errors.no_hp.join(' '));
+                }
+                if (response.errors.address) {
+                    $('#addressError' + formId).text(response.errors.address.join(' '));
+                }
+                if (response.errors.jurusan) {
+                    $('#jurusanError' + formId).text(response.errors.jurusan.join(' '));
+                }
+                if (response.errors.status) {
+                    $('#statusError' + formId).text(response.errors.status.join(' '));
+                }
+            }
+        }
+    });
+});
+
+
+document.getElementById('search-input').addEventListener('keyup', function() {
+        document.getElementById('search-form').submit();
+    });
+
+
+    // Toggle password visibility
+    function togglePasswordVisibility(fieldId) { 
+        const passwordField = document.getElementById(fieldId);
+        const eyeIcon = passwordField.nextElementSibling.querySelector('i');
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = "password";
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    }
 </script>
- @endsection
+@endsection
